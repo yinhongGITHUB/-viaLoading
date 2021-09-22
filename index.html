@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 模拟业务逻辑发请求
+        function myAjax() {
+            return new Promise((resolve) => {
+                // 模拟ajax
+                setTimeout(() => {
+                    resolve({
+                        ret:1,
+                        msg:"ok",
+                        data:{
+                            hello:"world",
+                        },
+                    });
+                }, 2000);
+            })
+        }   
+        /**
+         * 第一种方法===>加载中加载完成动画函数
+         * 1.利用async/await可以中断代码执行，等待异步任务返回的特性
+        */
+        // async function viaLoading(fn){
+        //     console.log("loading...");
+        //     await fn()
+        //     console.log("loading done");
+        // }
+        
+        /**
+         * 第二种方法===>加载中加载完成动画函数
+         * 利用生成器函数加上关键字yield中断js的同异步解析机制
+        */
+        // function viaLoading(fn){
+        //     let gen = function* (){
+        //         console.log("loading...");
+        //         yield fn()// 第一次next时代码执行到yield这一行，但是后面的代码也会被执行不过是放在返回对象的value中
+        //         console.log("loading done")
+        //     }()
+        //     gen.next().value.then(val => {
+        //         gen.next()
+        //     });
+        // }
+
+        /**
+         * 第三种方法===>加载中加载完成动画函数
+         * 1.利用promise进行同步异步任务的控制
+         * 2.利用promise.then()的返回值依旧是promise的特性，进行精简 
+        */
+        function viaLoading(fn){
+            // 常规写法
+            // let p = new Promise(resolve=>{
+            //     console.log("loading...")
+            //     resolve(fn())
+            // })
+            // p.then(val => {
+            //     console.log("loading done");
+            // })
+            
+            // 精简写法
+            console.log("loading...")
+            fn().then(value => {
+                console.log("loading done");
+            })
+        }
+
+        viaLoading(() => {
+            return myAjax().then((res) => {
+                console.log("res = ", res);
+            }).catch(err => {
+                console.error(err);
+            }).finally(() => {
+                console.log("maAjax finally");
+            })
+        })
+
+    </script>
+</body>
+</html>
